@@ -1,0 +1,76 @@
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>Broadband Usage</title>
+
+		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+		<script type="text/javascript" src="http://code.highcharts.com/highcharts.js"></script>
+
+		<script type="text/javascript">
+			
+		$(document).ready(function() {
+			var options = {
+				chart: {
+					renderTo: 'container',
+					type: 'line',
+					zoomType: 'xy'
+				},
+				title: {
+					text: 'Broadband Usage'
+				},
+				xAxis: {
+					type: 'datetime',
+					title: {
+						text: 'Time'
+					},
+					crosshair: true
+				},
+				yAxis: {
+					min: 0,
+					title: {
+						text: 'GB'
+					}
+				},
+				tooltip: {
+					xDateFormat: '<b>%Y-%m-%d %H:%M:%S</b>',
+					shared: true,
+					pointFormatter: function() {
+						var d = new Date(this.x);
+						return "<b>" + d.toLocaleTimeString() + ": </b>" + Math.round(100*this.y/(1000*1000*1000))/100 + " GB <br />";
+					}
+				},
+				series: [],
+			};
+			$.get('/data/', {}, function(data) {
+				var lines = data.split('\n');
+				$.each(lines, function(lineNo, line) {
+					var items = line.split(',');
+					
+					if (lineNo == 0) {
+						$.each(items, function(index, item) {
+							if (index > 0) {
+								options.series.push({ name: item, data: []});
+							}
+						});
+					} else {
+						var time;
+						$.each(items, function(index, item) {
+							if (index == 0) {
+								time = parseInt(item);
+							} else {
+								options.series[index-1].data.push([time, parseFloat(item)]);
+							}
+						});
+					}
+					
+				});
+				chart = new Highcharts.Chart(options);
+			});
+		});
+		</script>
+
+	</head>
+	<body>
+		<div id="container" style="width: 1000px; height: 600px; margin: 0 auto"></div>
+	</body>
+</html>

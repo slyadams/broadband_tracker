@@ -1,0 +1,6 @@
+{
+	"uri": "https://chaos.aa.net.uk/info?JSON=0",
+	"user": "your A&A user", 
+	"pass": "your A&A password",
+	"sqlite_file": "./lib/quota.sqlite"
+}

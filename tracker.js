@@ -104,21 +104,26 @@ app.use('/data', function getData(req, res, next) {
 	res.setHeader('content-type', 'text/plain');
 
 	db_connect(config.sqlite_file, false, function(db) {
-		var csv = "Time,Quota Remaining,Quota Total\n";
-		db.each("SELECT timestamp, quota_total, quota_remaining from quota_data order by timestamp", function(err, row) {
+		var data = [[],[]];
+		var start = query.start ? query.start : 0;
+		var end = query.end ? query.end : 999999999999999;
+		
+		db.each("SELECT timestamp, quota_total, quota_remaining from quota_data where timestamp >= ? and timestamp <= ? order by timestamp", [start, end], function(err, row) {
 			if (err) {
+				console.log(err);
 			} else {
-				csv += row.timestamp+","+row.quota_total+","+row.quota_remaining+"\n";
+				data[0].push([row.timestamp, row.quota_total]);
+				data[1].push([row.timestamp, row.quota_remaining]);
 			}
 		}, function() {
 			db.close();
-			res.end(csv);
+			res.end(JSON.stringify(data));
 			next();
 		});
 	}, function() {
 		res.setHeader('content-type', 'text/plain');
 		db.close();
-		res.end(csv);
+		res.end("");
 		next();
 	});
 });

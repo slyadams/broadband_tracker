@@ -4,19 +4,57 @@
 		<title>Broadband Usage</title>
 
 		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-		<script type="text/javascript" src="http://code.highcharts.com/highcharts.js"></script>
+		<script type="text/javascript" src="http://code.highcharts.com/stock/highstock.js"></script>
 
 		<script type="text/javascript">
 			
 		$(document).ready(function() {
+			function afterSetExtremes(e) {
+				$.get('/data/?start='+e.min+'&end='+e.max, {}, function(rawData) {
+					var chart = $("#container").highcharts();
+					var data = JSON.parse(rawData);
+					chart.series[0].setData(data[0]);
+					chart.series[1].setData(data[1]);
+				});
+			};
+
 			var options = {
 				chart: {
-					renderTo: 'container',
 					type: 'line',
 					zoomType: 'xy'
 				},
 				title: {
 					text: 'Broadband Usage'
+				},
+				rangeSelector: {
+					inputDateFormat: '%Y-%m-%d',
+					inputEditDateFormat: '%Y-%m-%d',
+					allButtonsEnabled:  true,
+					buttons: [{
+						type: 'hour',
+						count: 1,
+						text: '1h'
+					}, {
+						type: 'day',
+						count: 1,
+						text: '1d'
+					}, {
+						type: 'month',
+						count: 1,
+						text: '1m'
+					}, {
+						type: 'year',
+						count: 1,
+						text: '1y'
+					}, {
+						type: 'all',
+						text: 'All'
+					}],
+				},
+
+
+				legend: {
+					enabled: true,
 				},
 				xAxis: {
 					type: 'datetime',
@@ -25,21 +63,27 @@
 					},
 					crosshair: true,
 					dateTimeLabelFormats: {
-						//millisecond: '%H:%M:%S.%L',
-						//second: '%H:%M:%S',
-						//minute: '%H:%M',
-						//hour: '%H:%M',
 						day: '%Y-%m-%d',
-						//week: '%e. %b',
-						//month: '%b \'%y',
 						year: '%Y'
-					}
+					},
+					events : {
+						afterSetExtremes : afterSetExtremes
+					},
+					minRange: 60 * 60 * 1000,
 				},
 				yAxis: {
 					min: 0,
 					title: {
 						text: 'GB'
 					}
+				},
+				scrollbar: {
+					liveRedraw: false
+				},
+				plotOptions: {
+					line: {
+						gapSize: 2,
+					},
 				},
 				tooltip: {
 					xDateFormat: '<b>%Y-%m-%d %H:%M:%S</b>',
@@ -49,32 +93,12 @@
 						return "<b>" + d.toLocaleTimeString() + ": </b>" + Math.round(100*this.y/(1000*1000*1000))/100 + " GB <br />";
 					}
 				},
-				series: [],
 			};
-			$.get('/data/', {}, function(data) {
-				var lines = data.split('\n');
-				$.each(lines, function(lineNo, line) {
-					var items = line.split(',');
-					
-					if (lineNo == 0) {
-						$.each(items, function(index, item) {
-							if (index > 0) {
-								options.series.push({ name: item, data: []});
-							}
-						});
-					} else {
-						var time;
-						$.each(items, function(index, item) {
-							if (index == 0) {
-								time = parseInt(item);
-							} else {
-								options.series[index-1].data.push([time, parseFloat(item)]);
-							}
-						});
-					}
-					
-				});
-				chart = new Highcharts.Chart(options);
+			$.get('/data/', {}, function(rawData) {
+				var chart = $("#container").highcharts("StockChart", options).highcharts();
+				var data = JSON.parse(rawData);
+				chart.addSeries({ name: "Quota Total", data: data[0] });
+				chart.addSeries({ name: "Quota Remaining", data: data[1] });
 			});
 		});
 		</script>

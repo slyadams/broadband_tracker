@@ -17,3 +17,10 @@ To run either:
 Or if you want to run forever:
 
 	forever start -p ./ -l logs/forever.log -o logs/out.log -e logs/err.log forever/tracker.json
+
+
+Then point your browser to:
+
+	http://server_ip:3000
+
+Or whatever you changed your port to.

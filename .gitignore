@@ -1,2 +1,4 @@
 lib/*
-conf/get_quota.json
+conf/tracker.json
+node_modules
+todo

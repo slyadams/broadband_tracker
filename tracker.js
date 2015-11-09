@@ -88,7 +88,7 @@ function start_poll(config) {
 	}, 30*60*1000);
 }
 
-var config_file = "./conf/get_quota.json";
+var config_file = "./conf/tracker.json";
 if (process.argv.length > 2) {
 	config_file = process.argv[2];
 }
@@ -132,4 +132,6 @@ app.use('/', function getData(req, res, next) {
 	serve(req, res, next);
 });
 
-http.createServer(app).listen(3000);
+var port = config.port ? config.port : 3000;
+console.log("Starting server on port "+port);
+http.createServer(app).listen(port);

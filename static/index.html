@@ -9,12 +9,26 @@
 		<script type="text/javascript">
 			
 		$(document).ready(function() {
-			function afterSetExtremes(e) {
-				$.get('/data/?start='+e.min+'&end='+e.max, {}, function(rawData) {
-					var chart = $("#container").highcharts();
+			function updateData(chart, start, end) {
+				var query = '/data?';
+				if (start != null) { 
+					query += "start="+start+"&";
+				}
+				if (end != null) { 
+					query += "end="+end;
+				}
+				chart.showLoading();	
+				$.get(query, {}, function(rawData) {
 					var data = JSON.parse(rawData);
-					chart.series[0].setData(data[0]);
-					chart.series[1].setData(data[1]);
+					console.log(chart.series.length);
+					if (chart.series.length == 0) {
+						chart.addSeries({ name: "Quota Total", data: data[0] });
+						chart.addSeries({ name: "Quota Remaining", data: data[1] });
+					} else {
+						chart.series[0].setData(data[0]);
+						chart.series[1].setData(data[1]);
+					}
+					chart.hideLoading();	
 				});
 			};
 
@@ -26,33 +40,10 @@
 				title: {
 					text: 'Broadband Usage'
 				},
-				rangeSelector: {
-					inputDateFormat: '%Y-%m-%d',
-					inputEditDateFormat: '%Y-%m-%d',
-					allButtonsEnabled:  true,
-					buttons: [{
-						type: 'hour',
-						count: 1,
-						text: '1h'
-					}, {
-						type: 'day',
-						count: 1,
-						text: '1d'
-					}, {
-						type: 'month',
-						count: 1,
-						text: '1m'
-					}, {
-						type: 'year',
-						count: 1,
-						text: '1y'
-					}, {
-						type: 'all',
-						text: 'All'
-					}],
+
+				navigator : {
+					adaptToUpdatedData: false,
 				},
-
-
 				legend: {
 					enabled: true,
 				},
@@ -65,9 +56,6 @@
 					dateTimeLabelFormats: {
 						day: '%Y-%m-%d',
 						year: '%Y'
-					},
-					events : {
-						afterSetExtremes : afterSetExtremes
 					},
 					minRange: 60 * 60 * 1000,
 				},
@@ -85,6 +73,15 @@
 						gapSize: 2,
 					},
 				},
+				loading: {
+					labelStyle: {
+						fontWeight: 'normal',
+						color: 'white'
+					},
+					style: {
+						backgroundColor: 'gray'
+					}
+				},
 				tooltip: {
 					xDateFormat: '<b>%Y-%m-%d %H:%M:%S</b>',
 					shared: true,
@@ -94,17 +91,57 @@
 					}
 				},
 			};
-			$.get('/data/', {}, function(rawData) {
-				var chart = $("#container").highcharts("StockChart", options).highcharts();
-				var data = JSON.parse(rawData);
-				chart.addSeries({ name: "Quota Total", data: data[0] });
-				chart.addSeries({ name: "Quota Remaining", data: data[1] });
+			var chart = $("#container").highcharts(options).highcharts();
+			updateData(chart, null, null);
+
+			$("#this_month").click(function() {
+				var d = new Date();
+				updateData(chart, new Date(d.getFullYear(), d.getMonth()).getTime(), new Date().getTime());
+			});
+
+			$("#two_months").click(function() {
+				var d = new Date();
+				updateData(chart, new Date(d.getFullYear(), d.getMonth()-1).getTime(), new Date().getTime());
+			});
+
+			$("#three_months").click(function() {
+				var d = new Date();
+				updateData(chart, new Date(d.getFullYear(), d.getMonth()-2).getTime(), new Date().getTime());
+			});
+
+			$("#this_year").click(function() {
+				var d = new Date();
+				updateData(chart, new Date(d.getFullYear()).getTime(), new Date().getTime());
+			});
+
+			$("#all").click(function() {
+				updateData(chart, 0, new Date().getTime());
 			});
 		});
 		</script>
 
+		<style>
+			body {
+				font-family: Arial;
+			}
+			a.link {
+				float: left;
+				padding-right: 20px;
+			}
+			div.links {
+				text-align: center;
+			}
+		</style>
+
 	</head>
 	<body>
 		<div id="container" style="width: 1000px; height: 600px; margin: 0 auto"></div>
+		<div class="links" style="width: 550px; margin: 0 auto">
+			<a href="#" class="link" id="this_month">This month</a>
+			<a href="#" class="link" id="two_months">Last two months</p>
+			<a href="#" class="link" id="three_months">Last three months</p>
+			<a href="#" class="link" id="this_year">This year</p>
+			<a href="#" class="link" id="all">All</p>
+		</div>
 	</body>
 </html>

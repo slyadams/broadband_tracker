@@ -7,7 +7,7 @@ var fs = require('fs');
 
 function db_connect(file, write, success_callback, fail_callback) {
 	var mode = write ? sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE : sqlite3.OPEN_READONLY;
-	var db = new sqlite3.Database(config.sqlite_file, function(error) {
+	var db = new sqlite3.Database(file, function(error) {
 		if (error != null) {
 			if (fail_callback) {
 				fail_callback(error);
@@ -79,7 +79,7 @@ function add_data(db, config) {
 
 function start_poll(config) {
 	setInterval(function() {
-		db_connect(config.file,  true, function(db) {
+		db_connect(config.sqlite_file,  true, function(db) {
 			init_db(db);
 			add_data(db, config);
 		}, function(error) {
@@ -88,12 +88,19 @@ function start_poll(config) {
 	}, 30*60*1000);
 }
 
+function getMonthStart() {
+	var d = new Date();
+	return new Date(d.getFullYear(), d.getMonth(), d.getDay()).getTime();
+}
+
 var config_file = "./conf/tracker.json";
 if (process.argv.length > 2) {
 	config_file = process.argv[2];
 }
 var config = JSON.parse(fs.readFileSync(config_file, 'utf8'));
-start_poll(config);
+if (config.poll) {
+	start_poll(config);
+}
 
 var serveStatic = require('serve-static');
 var serve = serveStatic('static/', {'index': ['index.html', 'index.htm']});
@@ -105,9 +112,9 @@ app.use('/data', function getData(req, res, next) {
 
 	db_connect(config.sqlite_file, false, function(db) {
 		var data = [[],[]];
-		var start = query.start ? query.start : 0;
-		var end = query.end ? query.end : 999999999999999;
-		
+		var start = query.start ? query.start : getMonthStart();
+		var end = query.end ? query.end : new Date().getTime();
+			
 		db.each("SELECT timestamp, quota_total, quota_remaining from quota_data where timestamp >= ? and timestamp <= ? order by timestamp", [start, end], function(err, row) {
 			if (err) {
 				console.log(err);

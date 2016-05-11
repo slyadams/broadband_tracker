@@ -1,0 +1,27 @@
+{
+  "name": "broadband_tracker",
+  "version": "1.0.0",
+  "description": "A&A quota tracker",
+  "main": "tracker.js",
+  "dependencies": {
+    "connect": "^3.4.0",
+    "serve-static": "^1.10.0",
+    "sqlite3": "^3.1.2",
+    "compression": "^1.6.0",
+    "forever": "^0.15.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/slyadams/broadband_tracker.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/slyadams/broadband_tracker/issues"
+  },
+  "homepage": "https://github.com/slyadams/broadband_tracker#readme"
+}

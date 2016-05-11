@@ -111,7 +111,7 @@
 
 			$("#this_year").click(function() {
 				var d = new Date();
-				updateData(chart, new Date(d.getFullYear()).getTime(), new Date().getTime());
+				updateData(chart, new Date(d.getFullYear(), 0).getTime(), new Date().getTime());
 			});
 
 			$("#all").click(function() {

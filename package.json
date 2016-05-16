@@ -4,11 +4,12 @@
   "description": "A&A quota tracker",
   "main": "tracker.js",
   "dependencies": {
-    "connect": "^3.4.0",
-    "serve-static": "^1.10.0",
-    "sqlite3": "^3.1.2",
     "compression": "^1.6.0",
-    "forever": "^0.15.1"
+    "connect": "^3.4.0",
+    "forever": "^0.15.1",
+    "request": "^2.72.0",
+    "serve-static": "^1.10.0",
+    "sqlite3": "^3.1.2"
   },
   "devDependencies": {},
   "scripts": {

@@ -1,4 +1,4 @@
-lib/*
+data/*sqlite*
 conf/tracker.json
 node_modules
 todo

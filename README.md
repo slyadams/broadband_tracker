@@ -21,6 +21,6 @@ Or if you want to run forever:
 
 Then point your browser to:
 
-	http://server_ip:3000
+	http://server_ip:8080
 
 Or whatever you changed your port to.

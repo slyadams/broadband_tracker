@@ -1,7 +1,7 @@
 {
-	"uri": "https://chaos.aa.net.uk/info?JSON=0",
-	"user": "your A&A user", 
-	"pass": "your A&A password",
-	"sqlite_file": "./data/quota.sqlite",
-	"port": 8080
+    "uri": "https://chaos.aa.net.uk/info?JSON=0",
+    "user": "your A&A user", 
+    "pass": "your A&A password",
+    "sqlite_file": "./data/quota.sqlite",
+    "port": 8080
 }

@@ -3,5 +3,5 @@
 	"user": "your A&A user", 
 	"pass": "your A&A password",
 	"sqlite_file": "./data/quota.sqlite",
-	"port": 3000
+	"port": 8080
 }
